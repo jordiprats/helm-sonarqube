@@ -13,7 +13,7 @@ keywords:
   - coverage
   - quality
 home: https://www.sonarqube.org/
-icon: https://pbs.twimg.com/profile_images/1224335491899760641/h404B5dU_400x400.jpg
+icon: https://www.sonarqube.org/assets/logo-31ad3115b1b4b120f3d1efd63e6b13ac9f1f89437f0cf6881cc4d8b5603a52b4.svg
 sources:
   - https://github.com/SonarSource/sonarqube
   - https://github.com/SonarSource/docker-sonarqube
@@ -22,4 +22,4 @@ maintainers:
     email: jordi.prats@gmail.com
 annotations:
   artifacthub.io/changes: |
-    - Added sonarqube LTS support
+    - Added support for sonarqube 7.9 LTS

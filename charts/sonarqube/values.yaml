@@ -40,7 +40,7 @@ livenessProbe:
   httpGet:
     path: /api/system/status
     port: http
-  initialDelaySeconds: 60
+  initialDelaySeconds: 120
   periodSeconds: 30
   failureThreshold: 10
   timeoutSeconds: 1
@@ -49,7 +49,7 @@ readinessProbe:
   httpGet:
     path: /api/system/status
     port: http
-  initialDelaySeconds: 60
+  initialDelaySeconds: 120
   periodSeconds: 30
   failureThreshold: 10
   timeoutSeconds: 1
@@ -124,13 +124,13 @@ installPlugins:
     #   url: https://binaries.sonarsource.com/Distribution/my-plugin/my-plugin-1.0.0.jar
     #   copyToLib: false
 
-## These settings are only required if you wish to use an existing postgresql instance
+## These settings are required to configure access to the postgres database
 ##
 psql:
-  # host: postgresdb.local
-  # port: 5432
-  # database: sonarqube
-  # username: sonarqube
-  # password:
-  #   secret: sonarqube-postgres
-  #   key: password
+  host: postgresdb.local
+  port: 5432
+  database: sonarqube
+  username: sonarqube
+  password:
+    secret: sonarqube-postgres
+    key: password
