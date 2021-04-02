@@ -134,9 +134,3 @@ psql:
   # password:
   #   secret: sonarqube-postgres
   #   key: password
-
-## Configuration values for the postgresql dependency
-## ref: https://artifacthub.io/packages/helm/bitnami/postgresql/10.2.0
-##
-postgresql:
-  enabled: false

@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 ### Removed -->
 
+## 1.3.0
+
+- Added support for SonarQube 7.9 LTS
+- Improved ingress configuration to be able to [setup SSL redirection on AWS ALB](https://pet2cattle.com/2021/03/aws-ingress-alb-https-redirect)
+
 ## v1.2.2 - 2021-03-12
 
 ## Changed

@@ -7,13 +7,13 @@
 Before you can install the chart you will need to add the `stevehipwell` repo to [Helm](https://helm.sh/).
 
 ```shell
-helm repo add stevehipwell https://stevehipwell.github.io/helm-charts/
+helm repo add sonarqube https://jordiprats.github.io/helm-sonarqube/
 ```
 
 After you've installed the repo you can install the chart.
 
 ```shell
-helm upgrade --install --namespace default --values ./my-values.yaml my-release stevehipwell/sonarqube
+helm upgrade --install --namespace default --values ./values.yaml sonar sonarqube/sonarqube
 ```
 
 ## Configuration
@@ -26,6 +26,7 @@ The following table lists the configurable parameters of the _SonarQube_ chart a
 | `image.tag`                     | Image tag.                                                                                                                       | `{{ .Chart.AppVersion }}-community` |
 | `image.pullPolicy`              | Image pull policy.                                                                                                               | `IfNotPresent`                      |
 | `image.pullSecrets`             | Image pull secrets.                                                                                                              | `[]`                                |
+| `image.lts`                     | Whether is the LTS version.                                                                                                      | `false`                             |
 | `nameOverride`                  | Override the name of the chart.                                                                                                  | `nil`                               |
 | `fullnameOverride`              | Override the fullname of the chart.                                                                                              | `nil`                               |
 | `serviceAccount.create`         | If `true`, create a new service account.                                                                                         | `true`                              |
@@ -71,11 +72,10 @@ The following table lists the configurable parameters of the _SonarQube_ chart a
 | `psql.username`                 | External _PostgreSQL_ username                                                                                                   | `nil`                               |
 | `psql.password.secret`          | Name of the secret containing the external _PostgreSQL_ password                                                                 | `nil`                               |
 | `psql.password.key`             | Key on the secret containing the external _PostgreSQL_ password                                                                  | `nil`                               |
-| `postgresql.enabled`            | Enable _PostgreSQL_ sub chart, see [chart](https://hub.helm.sh/charts/bitnami/postgresql/4.2.2) for additional values.           | `false`                             |
 
 ## Database
 
-By default the [sonarqube](https://hub.docker.com/_/sonarqube/) image will create a [H2](https://www.h2database.com/html/main.html) database for evaluation purposes, this should **NOT be used in production**. You can either allow this chart to create a [PostgreSQL](https://hub.docker.com/_/postgres) instance specifically for _SonarQube_ by specifying `postgresql.enabled` as `true` or you can use an external _PostgreSQL_ instance by specifying the connection details on `psql`.
+PostgreSQL database is not installed by this chart, it must be already available
 
 ## Persistence
 
@@ -83,3 +83,7 @@ The [sonarqube](https://hub.docker.com/_/sonarqube/) image stores the _SonarQube
 
 Persistent Volume Claims are used to keep the data across deployments. This is known to work in GCE, AWS, and minikube.
 See the [Configuration](#configuration) section to configure the PVC or to disable persistence.
+
+## Forked
+
+This repo have been forked from [stevehipwell's sonarqube helm chart](https://github.com/stevehipwell/helm-charts) to be able to add support to the **LTS version**
