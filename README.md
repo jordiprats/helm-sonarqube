@@ -1,5 +1,7 @@
 # SonarQube
 
+[![Artifact HUB](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/sonarqube)](https://artifacthub.io/packages/search?repo=sonarqube)
+
 [SonarQube](https://www.sonarqube.org/) empowers all developers to write cleaner and safer code.
 
 ## Installing the Chart
