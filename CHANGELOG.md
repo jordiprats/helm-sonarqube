@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 ### Removed -->
 
+## 1.3.1
+
+- Fix NOTES output
+
 ## 1.3.0
 
 - Added support for SonarQube 7.9 LTS

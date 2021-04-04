@@ -8,6 +8,7 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
   pullSecrets: []
+  lts: false
 
 nameOverride: ""
 fullnameOverride: ""
