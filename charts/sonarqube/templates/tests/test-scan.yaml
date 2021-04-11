@@ -1,0 +1,155 @@
+{{- if .Values.tests.scans.enabled }}
+apiVersion: v1
+data:
+  scan.sh: |
+    #!/usr/bin/env sh
+
+    RETURN=0
+
+    {{- range $index, $val := .Values.tests.scans.projects }}
+
+    rm -fr /usr/src
+    mkdir -p /usr/src
+    git clone {{ $val.url }} /usr/src
+    echo -e "sonar.verbose=true\nsonar.log.level=DEBUG" > /usr/src/sonar-project.properties
+    echo "sonar.projectName={{ $val.name }}" >> /usr/src/sonar-project.properties
+    echo "sonar.projectKey={{ $val.key }}" >> /usr/src/sonar-project.properties
+    echo "sonar.login={{ $val.login }}" >> /usr/src/sonar-project.properties
+    sonar-scanner -X
+    RETURN=$(expr $RETURN + $?)
+
+    {{- if .Values.tests.scans.branchscan }}
+    echo "sonar.branch.name=branchscan" >> /usr/src/sonar-project.properties
+    sonar-scanner -X
+    RETURN=$(expr $RETURN + $?)
+    {{- end }}
+
+    {{- end }}
+
+    exit $RETURN
+kind: ConfigMap
+metadata:
+  name: name: "{{ .Release.Name }}-scan-test"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-scan-test"
+spec:
+  containers:
+  - command:
+    - /opt/scan.sh
+    env:
+    - name: SONAR_HOST_URL
+      value: http://sonarqube:9000
+    - name: SONAR_LOGIN
+      value: 69e2e64f0e3047664df514c09ca648c8f3eaa6d8
+    image: sonarsource/sonar-scanner-cli
+    imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+    name: scan
+    resources: {}
+    terminationMessagePath: /dev/termination-log
+    terminationMessagePolicy: File
+    volumeMounts:
+    - mountPath: /opt/scan.sh
+      name: scripts
+      subPath: scan.sh
+    - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+      name: default-token-bhzxq
+      readOnly: true
+
+  restartPolicy: Never  
+  {{- if .Values.securityContext.enabled }}
+  securityContext:
+    runAsUser: {{ .Values.securityContext.runAsUser }}
+  {{- end }}
+
+
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  nodeName: ip-10-103-199-166.us-west-2.compute.internal
+  priority: 0
+  
+  schedulerName: default-scheduler
+  serviceAccount: default
+  serviceAccountName: default
+  terminationGracePeriodSeconds: 30
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/not-ready
+    operator: Exists
+    tolerationSeconds: 300
+  - effect: NoExecute
+    key: node.kubernetes.io/unreachable
+    operator: Exists
+    tolerationSeconds: 300
+  volumes:
+  - configMap:
+      defaultMode: 493
+      name: sonartest
+    name: scripts
+  - name: default-token-bhzxq
+    secret:
+      defaultMode: 420
+      secretName: default-token-bhzxq
+status:
+  conditions:
+  - lastProbeTime: null
+    lastTransitionTime: "2021-04-01T11:45:05Z"
+    status: "True"
+    type: Initialized
+  - lastProbeTime: null
+    lastTransitionTime: "2021-04-01T11:45:05Z"
+    message: 'containers with unready status: [api-status scan]'
+    reason: ContainersNotReady
+    status: "False"
+    type: Ready
+  - lastProbeTime: null
+    lastTransitionTime: "2021-04-01T11:45:05Z"
+    message: 'containers with unready status: [api-status scan]'
+    reason: ContainersNotReady
+    status: "False"
+    type: ContainersReady
+  - lastProbeTime: null
+    lastTransitionTime: "2021-04-01T11:45:05Z"
+    status: "True"
+    type: PodScheduled
+  containerStatuses:
+  - containerID: docker://36df8fc04569a7036076d22ebf3e7820aa8d518bab4333984755d5b4282a0984
+    image: curlimages/curl:latest
+    imageID: docker-pullable://curlimages/curl@sha256:9f58af81930f2b562a07dffc1f4bcffced907e1b78c1ef2d18f1731af9daece6
+    lastState: {}
+    name: api-status
+    ready: false
+    restartCount: 0
+    started: false
+    state:
+      terminated:
+        containerID: docker://36df8fc04569a7036076d22ebf3e7820aa8d518bab4333984755d5b4282a0984
+        exitCode: 0
+        finishedAt: "2021-04-01T11:45:10Z"
+        reason: Completed
+        startedAt: "2021-04-01T11:45:09Z"
+  - containerID: docker://1c4189c9842cbd698f15f2229962533a6f6d3b43f512e0417188bc116d5fae69
+    image: sonarsource/sonar-scanner-cli:latest
+    imageID: docker-pullable://sonarsource/sonar-scanner-cli@sha256:7047e7b089dc6496770f820d833bae57bd6d4a28e66bb41282eafb943dd62493
+    lastState: {}
+    name: scan
+    ready: false
+    restartCount: 0
+    started: false
+    state:
+      terminated:
+        containerID: docker://1c4189c9842cbd698f15f2229962533a6f6d3b43f512e0417188bc116d5fae69
+        exitCode: 2
+        finishedAt: "2021-04-01T11:45:33Z"
+        reason: Error
+        startedAt: "2021-04-01T11:45:10Z"
+  hostIP: 10.103.199.166
+  phase: Failed
+  podIP: 10.103.198.183
+  podIPs:
+  - ip: 10.103.198.183
+  qosClass: BestEffort
+  startTime: "2021-04-01T11:45:05Z"
+{{- end }}

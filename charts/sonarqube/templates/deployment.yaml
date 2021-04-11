@@ -70,10 +70,6 @@ spec:
         - name: download-plugins
           image: alpine:3
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.image.lts }}
-          securityContext:
-            runAsUser: 0
-          {{ end -}}
           {{- with .Values.env }}
           env:
             {{- toYaml . | nindent 12 }}
@@ -86,6 +82,46 @@ spec:
             - mountPath: /opt/sonarqube/extensions
               name: sonarqube
               subPath: extensions
+        {{- if .Values.image.lts }}
+        - name: copy-sonarqube-lib
+          image: {{ printf "%s:%s" .Values.image.repository (.Values.image.tag | default (printf "%s-community" .Chart.AppVersion)) }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.image.lts }}
+          securityContext:
+            runAsUser: 0
+          {{- end }}
+          command: ["sh", "-c", "cp -pr /opt/sonarqube/lib/* /opt/sonarqube/lib-instance"]
+          volumeMounts:
+            - mountPath: /opt/sonarqube/lib-instance
+              name: sonarqube
+              subPath: lib
+        {{- end }}
+        - name: install-plugins
+          image: alpine:3
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.image.lts }}
+          securityContext:
+            runAsUser: 0
+          {{- end }}
+          command: ["/opt/scripts/install-plugins.sh"]
+          volumeMounts:
+            - mountPath: /opt/scripts/install-plugins.sh
+              name: commands
+              subPath: install-plugins.sh
+            - mountPath: /opt/sonarqube/extensions
+              name: sonarqube
+              subPath: extensions
+            - mountPath: /opt/sonarqube/lib
+              name: sonarqube
+              subPath: lib
       {{- end }}
       {{- if .Values.sonarSecretProperties.enabled }}
         - name: concat-properties
@@ -136,9 +172,6 @@ spec:
             {{- with .Values.env }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- if .Values.installPlugins.enabled }}
-          command: ["/opt/scripts/install-plugins.sh"]
-          {{- end }}
           ports:
             - name: http
               containerPort: 9000
@@ -147,12 +180,9 @@ spec:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
+          startupProbe:
+            {{- toYaml .Values.startupProbe | nindent 12 }}
           volumeMounts:
-          {{- if .Values.installPlugins.enabled }}
-            - mountPath: /opt/scripts/install-plugins.sh
-              name: commands
-              subPath: install-plugins.sh
-          {{- end }}
             - mountPath: /opt/sonarqube/conf
           {{- if .Values.sonarSecretProperties.enabled }}
               name: config-concat
@@ -174,6 +204,9 @@ spec:
             - mountPath: /opt/sonarqube/temp
               name: sonarqube
               subPath: temp
+            - mountPath: /opt/sonarqube/lib
+              name: sonarqube
+              subPath: lib
             - mountPath: /tmp
               name: tmp-dir
           resources:

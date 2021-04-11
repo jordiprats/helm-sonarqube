@@ -13,6 +13,18 @@ image:
 nameOverride: ""
 fullnameOverride: ""
 
+tests:
+  api:
+    enabled: false
+  scans:
+    enabled: false
+    branchscan: false
+    projects: {}
+      # - name: matecurses
+      #   url: https://github.com/jordiprats/python-matecurses
+      #   key: python:matecurses
+      #   login: 9da715cf4c909428faa18fb09d8a76ac05490845
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -41,7 +53,7 @@ livenessProbe:
   httpGet:
     path: /api/system/status
     port: http
-  initialDelaySeconds: 120
+  initialDelaySeconds: 10
   periodSeconds: 30
   failureThreshold: 10
   timeoutSeconds: 1
@@ -50,10 +62,17 @@ readinessProbe:
   httpGet:
     path: /api/system/status
     port: http
-  initialDelaySeconds: 120
+  initialDelaySeconds: 10
   periodSeconds: 30
   failureThreshold: 10
   timeoutSeconds: 1
+
+startupProbe:
+  httpGet:
+    path: /api/system/status
+    port: http
+  failureThreshold: 30
+  periodSeconds: 10
 
 service:
   type: ClusterIP
@@ -78,8 +97,8 @@ persistence:
   annotations: {}
   # existingClaim: existing-pvc
   accessMode: ReadWriteOnce
-  storageClass: standard
-  size: 8Gi
+  # storageClass: standard
+  size: 10Gi
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

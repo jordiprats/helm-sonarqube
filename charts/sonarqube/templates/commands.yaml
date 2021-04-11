@@ -50,5 +50,3 @@ data:
     cp -f /opt/sonarqube/extensions/cache/{{ $val.name }}.jar /opt/sonarqube/lib/common/{{ $val.name }}.jar
     {{- end }}
     {{- end }}
-
-    /opt/sonarqube/bin/run.sh

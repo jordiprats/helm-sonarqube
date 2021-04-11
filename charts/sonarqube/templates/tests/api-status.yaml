@@ -1,0 +1,26 @@
+{{- if .Values.tests.api.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ .Release.Name }}-api-status-test"
+spec:
+  containers:
+    - name: {{ .Release.Name }}-api-status-test
+      image: curlimages/curl
+      imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+      {{- if .Values.securityContext.enabled }}
+      securityContext:
+        runAsUser: {{ .Values.securityContext.runAsUser }}
+      {{- end }}
+      env:
+        - name: SONAR_HOST
+          value: {{ include "sonarqube.fullname" . }}
+        - name: SONAR_PORT
+          value: {{ .Values.service.port }}
+      command:
+        - /bin/sh
+        - -ec
+        - |
+            curl -I http://$SONAR_HOST:$SONAR_PORT/api/system/status | grep UP
+  restartPolicy: Never
+{{- end }}
